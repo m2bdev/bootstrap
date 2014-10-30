@@ -131,7 +131,8 @@ angular.module('ui.bootstrap.typeahead', ['ui.bootstrap.position', 'ui.bootstrap
           if (onCurrentRequest && hasFocus) {
             if (matches.length > 0) {
 
-              scope.activeIdx = 0;
+              //Do not preselect an item if set to editable
+              scope.activeIdx = isEditable ? -1 : 0;
               scope.matches.length = 0;
 
               //transform labels
@@ -246,16 +247,26 @@ angular.module('ui.bootstrap.typeahead', ['ui.bootstrap.position', 'ui.bootstrap
         var locals = {};
         var model, item;
 
-        locals[parserResult.itemName] = item = scope.matches[activeIdx].model;
-        model = parserResult.modelMapper(originalScope, locals);
-        $setModelValue(originalScope, model);
-        modelCtrl.$setValidity('editable', true);
+        //ActiveIdx can be -1 if editable=true
+        if (activeIdx != -1) {
+            locals[parserResult.itemName] = item = scope.matches[activeIdx].model;
+            model = parserResult.modelMapper(originalScope, locals);
+            $setModelValue(originalScope, model);
+            modelCtrl.$setValidity('editable', true);
 
-        onSelectCallback(originalScope, {
-          $item: item,
-          $model: model,
-          $label: parserResult.viewMapper(originalScope, locals)
-        });
+            onSelectCallback(originalScope, {
+                $item: item,
+                $model: model,
+                $label: parserResult.viewMapper(originalScope, locals)
+            });
+        }
+        else {
+            onSelectCallback(originalScope, {
+                $item: null,
+                $model: null,
+                $label: null
+            });
+        }
 
         resetMatches();
 
@@ -275,23 +286,29 @@ angular.module('ui.bootstrap.typeahead', ['ui.bootstrap.position', 'ui.bootstrap
         evt.preventDefault();
 
         if (evt.which === 40) {
-          scope.activeIdx = (scope.activeIdx + 1) % scope.matches.length;
-          scope.$digest();
+            scope.activeIdx = (scope.activeIdx + 1) % scope.matches.length;
+            scope.$digest();
 
-        } else if (evt.which === 38) {
-          scope.activeIdx = (scope.activeIdx ? scope.activeIdx : scope.matches.length) - 1;
-          scope.$digest();
+        }
+        else if (evt.which === 38 && scope.activeIdx <= 0) {
+            scope.activeIdx = -1;
+            scope.$digest();
+
+        }
+        else if (evt.which === 38) {
+            scope.activeIdx = (scope.activeIdx ? scope.activeIdx : scope.matches.length) - 1;
+            scope.$digest();
 
         } else if (evt.which === 13 || evt.which === 9) {
-          scope.$apply(function () {
-            scope.select(scope.activeIdx);
-          });
+            scope.$apply(function () {
+                scope.select(scope.activeIdx);
+            });
 
         } else if (evt.which === 27) {
-          evt.stopPropagation();
+            evt.stopPropagation();
 
-          resetMatches();
-          scope.$digest();
+            resetMatches();
+            scope.$digest();
         }
       });
 
