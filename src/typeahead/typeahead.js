@@ -355,6 +355,9 @@ angular.module('ui.bootstrap.typeahead', ['ui.bootstrap.position', 'ui.bootstrap
       templateUrl:'template/typeahead/typeahead-popup.html',
       link:function (scope, element, attrs) {
 
+		//Set popup width to width of input
+		element.css("width", element.prev().css("width"));
+		
         scope.templateUrl = attrs.templateUrl;
 
         scope.isOpen = function () {
