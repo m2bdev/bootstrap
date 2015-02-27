@@ -286,35 +286,29 @@ angular.module('ui.bootstrap.typeahead', ['ui.bootstrap.position', 'ui.bootstrap
         }
 
         // if there's nothing selected (i.e. focusFirst) and enter is hit, don't do anything
-        if (scope.activeIdx == -1 && (evt.which === 13 || evt.which === 9)) {
+        /*if (scope.activeIdx == -1 && (evt.which === 13 || evt.which === 9)) {
           return;
-        }
+        }*/
 
         evt.preventDefault();
 
         if (evt.which === 40) {
-            scope.activeIdx = (scope.activeIdx + 1) % scope.matches.length;
-            scope.$digest();
-
-          scope.activeIdx = (scope.activeIdx > 0 ? scope.activeIdx : scope.matches.length) - 1;
+            scope.activeIdx = (scope.activeIdx < scope.matches.length - 1 ? scope.activeIdx + 1 : 0);
+            scope.$digest();            
         }
         else if (evt.which === 38 && scope.activeIdx <= 0) {
-            scope.activeIdx = -1;
+            resetMatches();
             scope.$digest();
-
         }
         else if (evt.which === 38) {
             scope.activeIdx = (scope.activeIdx ? scope.activeIdx : scope.matches.length) - 1;
             scope.$digest();
-
         } else if (evt.which === 13 || evt.which === 9) {
             scope.$apply(function () {
                 scope.select(scope.activeIdx);
             });
-
         } else if (evt.which === 27) {
             evt.stopPropagation();
-
             resetMatches();
             scope.$digest();
         }
@@ -332,10 +326,10 @@ angular.module('ui.bootstrap.typeahead', ['ui.bootstrap.position', 'ui.bootstrap
         }
       };
 
-      $document.bind('click', dismissClickHandler);
+      $("body").bind('click', dismissClickHandler);
 
       originalScope.$on('$destroy', function(){
-        $document.unbind('click', dismissClickHandler);
+        $("body").unbind('click', dismissClickHandler);
         if (appendToBody) {
           $popup.remove();
         }
