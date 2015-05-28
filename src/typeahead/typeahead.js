@@ -346,7 +346,7 @@ angular.module('ui.bootstrap.typeahead', ['ui.bootstrap.position', 'ui.bootstrap
 
 }])
 
-  .directive('typeaheadPopup', function () {
+  .directive('typeaheadPopup', ['$timeout', function ($timeout) {
     return {
       restrict:'EA',
       scope:{
@@ -361,7 +361,9 @@ angular.module('ui.bootstrap.typeahead', ['ui.bootstrap.position', 'ui.bootstrap
       link:function (scope, element, attrs) {
 
 		//Set popup width to width of input
-		element.css("width", element.prev().css("width"));
+        $timeout(function () {
+            element.css("width", element.prev().css("width"));
+        }, 750);
 		
         scope.templateUrl = attrs.templateUrl;
 
@@ -382,7 +384,7 @@ angular.module('ui.bootstrap.typeahead', ['ui.bootstrap.position', 'ui.bootstrap
         };
       }
     };
-  })
+  }])
 
   .directive('typeaheadMatch', ['$http', '$templateCache', '$compile', '$parse', function ($http, $templateCache, $compile, $parse) {
     return {
